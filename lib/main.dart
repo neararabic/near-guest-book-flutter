@@ -1,5 +1,8 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_guest_book/api_provider.dart';
 import 'package:flutter_guest_book/screens/login.dart';
+import 'package:provider/provider.dart';
 
 void main() {
   runApp(const MyApp());
@@ -12,12 +15,16 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Guest Book',
-      theme: ThemeData(
-        primarySwatch: Colors.deepPurple,
-      ),
-      home: const MyHomePage(title: 'NEAR Guest Book (testnet)'),
-    );
+        title: 'Guest Book',
+        theme: ThemeData(
+          primarySwatch: Colors.deepPurple,
+        ),
+        home: MultiProvider(
+          providers: [
+            ChangeNotifierProvider<APIProvider>(create: (_) => APIProvider()),
+          ],
+          child: const MyHomePage(title: 'NEAR Guest Book (testnet)'),
+        ));
   }
 }
 
@@ -30,8 +37,16 @@ class MyHomePage extends StatefulWidget {
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   bool isLoggedIn = false;
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    if (kDebugMode) {
+      print("State: $state");
+    }
+  }
 
   @override
   Widget build(BuildContext context) {

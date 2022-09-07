@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_guest_book/api_provider.dart';
 import 'package:flutter_guest_book/near_api_flutter.dart';
 import 'package:near_api_flutter/near_api_flutter.dart';
+import 'package:provider/provider.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -9,28 +11,61 @@ class LoginScreen extends StatefulWidget {
   State<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver{
   String accountId = "";
   bool invalidAccountId = false;
   bool isConnectWalletDisabled = true;
   KeyPair keyPair = KeyStore.newKeyPair();
   bool isLoggedIn = false;
 
+  late APIProvider provider;
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    print(state);
+    switch(state){
+      case AppLifecycleState.resumed:
+        APIProvider().validateLogin(accountId,keyPair);
+        break;
+    }
+  }
+
+  @override
+  void initState() {
+    WidgetsBinding.instance.addObserver(this);
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 150,
-      child: Card(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            buildUserAccountIdTextField(),
-            buildAccountIdErrorMessage(),
-            buildLoginButton()
-          ],
-        ),
-      ),
-    );
+    provider = Provider.of<APIProvider>(context);
+    switch (APIProvider().state) {
+      case APIProviderState.loggedInSucceeded:
+        return const Center(child: Text("LoggedIn"));
+      case APIProviderState.validatingLogin:
+        return const Center(child: Text("loading........."));
+      default:
+        return SizedBox(
+          height: 150,
+          child: Card(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                buildUserAccountIdTextField(),
+                buildAccountIdErrorMessage(),
+                buildLoginButton()
+              ],
+            ),
+          ),
+        );
+    }
   }
 
   buildUserAccountIdTextField() {
