@@ -3,12 +3,19 @@ import 'package:flutter_guest_book/near_api_flutter.dart';
 import 'package:near_api_flutter/near_api_flutter.dart';
 import '../local_storage.dart';
 
-enum WalletConnectionState { initial, loggedOut, validatingLogin, loggedIn, loginFailed }
+enum WalletConnectionState {
+  initial,
+  loggedOut,
+  validatingLogin,
+  loggedIn,
+  loginFailed
+}
 
 class WalletConnectProvider with ChangeNotifier {
   WalletConnectionState state = WalletConnectionState.initial;
 
-  static final WalletConnectProvider _singleton = WalletConnectProvider._internal();
+  static final WalletConnectProvider _singleton =
+      WalletConnectProvider._internal();
 
   factory WalletConnectProvider() {
     return _singleton;
@@ -17,7 +24,6 @@ class WalletConnectProvider with ChangeNotifier {
   WalletConnectProvider._internal();
 
   checkLoggedInUser() async {
-
     KeyPair? key = await LocalStorage.loadKeys();
     if (key != null) {
       updateState(WalletConnectionState.loggedIn);
@@ -40,6 +46,4 @@ class WalletConnectProvider with ChangeNotifier {
     this.state = state;
     notifyListeners();
   }
-
-
 }

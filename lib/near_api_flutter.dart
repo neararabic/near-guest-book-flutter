@@ -1,7 +1,6 @@
 import 'package:near_api_flutter/near_api_flutter.dart';
 
 class NearApiFlutter {
-
   Future<bool> hasAccessKey(accountId, KeyPair keyPair) async {
     Account account = Account(
         accountId: accountId,

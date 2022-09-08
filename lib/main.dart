@@ -38,14 +38,15 @@ class AppContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    WalletConnectProvider provider = Provider.of<WalletConnectProvider>(context);
+    WalletConnectProvider provider =
+        Provider.of<WalletConnectProvider>(context);
 
     switch (provider.state) {
       case WalletConnectionState.initial:
         provider.checkLoggedInUser();
         return const CenteredCircularProgressIndicator();
       case WalletConnectionState.loggedIn:
-        return HomePage();
+        return const HomePage();
       case WalletConnectionState.loggedOut:
       case WalletConnectionState.loginFailed:
         return const ConnectWalletScreen();

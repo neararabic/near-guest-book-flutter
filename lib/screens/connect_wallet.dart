@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_guest_book/providers/connect_wallet_provider.dart';
-import 'package:flutter_guest_book/near_api_flutter.dart';
 import 'package:flutter_guest_book/screens/home_page.dart';
 import 'package:near_api_flutter/near_api_flutter.dart';
 import 'package:provider/provider.dart';
@@ -19,7 +18,6 @@ class _ConnectWalletScreenState extends State<ConnectWalletScreen>
   bool isConnectWalletDisabled = true;
 
   late WalletConnectProvider provider;
-
   late KeyPair keyPair;
 
   @override
@@ -29,7 +27,7 @@ class _ConnectWalletScreenState extends State<ConnectWalletScreen>
       case WalletConnectionState.loggedIn:
         Future.delayed(const Duration(seconds: 2)).then((_) {
           Navigator.of(context).pushReplacement(MaterialPageRoute(
-              builder: (context) => HomePage()));
+              builder: (context) => const HomePage()));
         });
         return const CenteredCircularProgressIndicator();
       case WalletConnectionState.loggedOut:
