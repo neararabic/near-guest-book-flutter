@@ -78,7 +78,7 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver{
             checkNearAccountId(accountId);
           });
         },
-        decoration: const InputDecoration(labelText: "NEAR Account"),
+        decoration: const InputDecoration(labelText: "NEAR account to connect with"),
       ),
     );
   }
