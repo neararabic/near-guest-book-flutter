@@ -18,7 +18,6 @@ class _ConnectWalletScreenState extends State<ConnectWalletScreen>
   bool isConnectWalletDisabled = true;
 
   late WalletConnectProvider provider;
-  late KeyPair keyPair;
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +26,9 @@ class _ConnectWalletScreenState extends State<ConnectWalletScreen>
       case WalletConnectionState.loggedIn:
         Future.delayed(const Duration(seconds: 2)).then((_) {
           Navigator.of(context).pushReplacement(MaterialPageRoute(
-              builder: (context) => const HomePage()));
+              builder: (context) => HomePage(
+                    keyPair: provider.keyPair!,
+                  )));
         });
         return const CenteredCircularProgressIndicator();
       case WalletConnectionState.loggedOut:
@@ -61,8 +62,7 @@ class _ConnectWalletScreenState extends State<ConnectWalletScreen>
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
+            SafeArea(
               child: TextField(
                 onChanged: (value) {
                   setState(() {
@@ -111,12 +111,12 @@ class _ConnectWalletScreenState extends State<ConnectWalletScreen>
     const String signInFailureUrl =
         'https://near-transaction-serializer.herokuapp.com/failure';
 
-    keyPair = KeyStore.newKeyPair();
+    provider.keyPair = KeyStore.newKeyPair();
 
     //Create NEAR Account object to connect to the wallet with
     Account account = Account(
         accountId: accountId,
-        keyPair: keyPair,
+        keyPair: provider.keyPair!,
         provider: NEARTestNetRPCProvider());
 
     //create a wallet object and connect to it
@@ -125,8 +125,8 @@ class _ConnectWalletScreenState extends State<ConnectWalletScreen>
     var wallet = Wallet(walletURL);
     wallet.connect(contractId, appTitle, signInSuccessUrl, signInFailureUrl,
         account.publicKey);
-
   }
+
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
@@ -134,15 +134,14 @@ class _ConnectWalletScreenState extends State<ConnectWalletScreen>
     switch (state) {
       case AppLifecycleState.resumed:
         if (accountId != "") {
-          WalletConnectProvider()
-              .validateLogin(accountId, keyPair); //changes ui state to validating
+          WalletConnectProvider().validateLogin(
+              accountId, provider.keyPair!); //changes ui state to validating
         }
         break;
       default:
         break;
     }
   }
-
 
   checkNearAccountId(accountId) {
     RegExp regExp = RegExp(

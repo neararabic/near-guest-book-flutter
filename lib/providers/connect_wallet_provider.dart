@@ -23,9 +23,11 @@ class WalletConnectProvider with ChangeNotifier {
 
   WalletConnectProvider._internal();
 
+  KeyPair? keyPair;
+
   checkLoggedInUser() async {
-    KeyPair? key = await LocalStorage.loadKeys();
-    if (key != null) {
+    keyPair = await LocalStorage.loadKeys();
+    if (keyPair != null) {
       updateState(WalletConnectionState.loggedIn);
     } else {
       updateState(WalletConnectionState.loggedOut);

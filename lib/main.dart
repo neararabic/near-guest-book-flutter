@@ -17,8 +17,10 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
         title: 'Guest Book',
         theme: ThemeData(
-          primarySwatch: Colors.deepPurple,
-        ),
+            colorScheme: ColorScheme.fromSwatch()
+                .copyWith(primary: const Color.fromARGB(255, 142, 193, 217))
+            // primarySwatch: const Color.fromARGB(255, 142, 193, 217),
+            ),
         home: Scaffold(
             appBar: AppBar(
               title: const Text("NEAR Guest Book - testnet"),
@@ -46,7 +48,7 @@ class AppContainer extends StatelessWidget {
         provider.checkLoggedInUser();
         return const CenteredCircularProgressIndicator();
       case WalletConnectionState.loggedIn:
-        return const HomePage();
+        return HomePage(keyPair: provider.keyPair!);
       case WalletConnectionState.loggedOut:
       case WalletConnectionState.loginFailed:
         return const ConnectWalletScreen();
