@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_guest_book/providers/connect_wallet_provider.dart';
+import 'package:flutter_guest_book/providers/home_page.dart';
 import 'package:flutter_guest_book/screens/home_page.dart';
 import 'package:flutter_guest_book/screens/connect_wallet.dart';
 import 'package:provider/provider.dart';
@@ -29,6 +30,8 @@ class MyApp extends StatelessWidget {
               providers: [
                 ChangeNotifierProvider<WalletConnectProvider>(
                     create: (_) => WalletConnectProvider()),
+                ChangeNotifierProvider<HomePageProvider>(
+                    create: (_) => HomePageProvider())
               ],
               child: const AppContainer(),
             )));
