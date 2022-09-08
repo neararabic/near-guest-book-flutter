@@ -16,7 +16,7 @@ class LocalStorage {
   }
 
   static Future<KeyPair?> loadKeys() async {
-    final prefs = await SharedPreferences.getInstance();
+    final prefs = await SharedPreferences. getInstance();
 
     //private key handling
     final List<String>? privateKeyStr =

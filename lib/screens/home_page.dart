@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_guest_book/providers/home_page.dart';
 import 'package:near_api_flutter/near_api_flutter.dart';
 import 'package:provider/provider.dart';
+import '../models/message.dart';
 
 class HomePage extends StatefulWidget {
   final KeyPair keyPair;
@@ -16,14 +17,6 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   String message = "";
   int donation = 0;
-  List messagesList = [
-    {
-      "title": "Hello world",
-      "subtitle": "From the other side",
-      "premeum": true
-    },
-    {"title": "Good morning", "subtitle": "Yes", "premeum": false},
-  ];
   late HomePageProvider provider;
 
   @override
@@ -87,15 +80,15 @@ class _HomePageState extends State<HomePage> {
           style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
         ),
         Expanded(
-          child: ListView.builder(
-            itemCount: messagesList.length,
+          child:  ListView.builder(
+            itemCount: provider.messages.length,
             itemBuilder: (context, index) {
-              final item = messagesList[index];
+              Message item = provider.messages[index];
               return ListTile(
                 contentPadding: const EdgeInsets.all(0),
                 horizontalTitleGap: 0,
                 minLeadingWidth: 0,
-                leading: item['premeum']
+                leading: item.premium!
                     ? const VerticalDivider(
                         color: Color.fromARGB(255, 142, 193, 217),
                         thickness: 3,
@@ -103,8 +96,8 @@ class _HomePageState extends State<HomePage> {
                     : const SizedBox(
                         width: 15,
                       ),
-                title: Text(item['title']),
-                subtitle: Text(item['subtitle']),
+                title: Text(item.sender!),
+                subtitle: Text(item.text!),
               );
             },
           ),

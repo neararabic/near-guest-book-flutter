@@ -104,7 +104,7 @@ class _ConnectWalletScreenState extends State<ConnectWalletScreen>
   connectWallet(accountId) {
     //TODO replace with your own contract id and urls
     const String walletURL = 'https://wallet.testnet.near.org/login/?';
-    const String contractId = 'dev-1662536120717-43089161055688';
+    const String contractId = 'guestbook.nearflutter.testnet';
     const String appTitle = 'GuestBook';
     const String signInSuccessUrl =
         'https://near-transaction-serializer.herokuapp.com/success';
