@@ -103,7 +103,7 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver{
         ? const Padding(
             padding: EdgeInsets.symmetric(vertical: 8.0),
             child: Text(
-              " Invalid near account ID (e.g. hamzatest.testnet) ",
+              " Invalid near account ID (e.g. nearflutter.testnet) ",
               style: TextStyle(
                   color: Colors.redAccent, backgroundColor: Colors.amberAccent),
             ),
