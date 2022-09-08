@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_guest_book/api_provider.dart';
+import 'package:flutter_guest_book/providers/login.dart';
 import 'package:flutter_guest_book/near_api_flutter.dart';
-import 'package:near_api_flutter/near_api_flutter.dart';
+import 'package:flutter_guest_book/screens/guest_book.dart';
 import 'package:provider/provider.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -11,22 +11,23 @@ class LoginScreen extends StatefulWidget {
   State<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver{
+class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
   String accountId = "";
   bool invalidAccountId = false;
   bool isConnectWalletDisabled = true;
-  KeyPair keyPair = KeyStore.newKeyPair();
-  bool isLoggedIn = false;
 
-  late APIProvider provider;
+  late LoginProvider provider;
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
-    print(state);
-    switch(state){
+    switch (state) {
       case AppLifecycleState.resumed:
-        APIProvider().validateLogin(accountId,keyPair);
+        if (accountId != "") {
+          LoginProvider().validateLogin(accountId);
+        }
+        break;
+      default:
         break;
     }
   }
@@ -45,27 +46,47 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver{
 
   @override
   Widget build(BuildContext context) {
-    provider = Provider.of<APIProvider>(context);
-    switch (APIProvider().state) {
-      case APIProviderState.loggedInSucceeded:
-        return const Center(child: Text("LoggedIn"));
-      case APIProviderState.validatingLogin:
-        return const Center(child: Text("loading........."));
+    provider = Provider.of<LoginProvider>(context);
+    switch (LoginProvider().state) {
+      case LoginState.initial:
+        provider.loadPrefs();
+        return const Center(child: CircularProgressIndicator());
+      case LoginState.loggedIn:
+        return GuestBook(keyPair: provider.keyPair);
+      case LoginState.loggedOut:
+        return buildLoginCard();
+      case LoginState.validatingLogin:
+        return const Center(child: CircularProgressIndicator());
+      case LoginState.loginFailed:
+        return buildLoginFailed();
       default:
-        return SizedBox(
-          height: 150,
-          child: Card(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                buildUserAccountIdTextField(),
-                buildAccountIdErrorMessage(),
-                buildLoginButton()
-              ],
-            ),
-          ),
-        );
+        return buildLoginCard();
     }
+  }
+
+  buildLoginFailed() {
+    return Column(
+      children: [
+        buildLoginCard(),
+        buildErrorText("Wallet connection failed, please try again")
+      ],
+    );
+  }
+
+  buildLoginCard() {
+    return SizedBox(
+      height: 150,
+      child: Card(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            buildUserAccountIdTextField(),
+            buildAccountIdErrorMessage(),
+            buildLoginButton()
+          ],
+        ),
+      ),
+    );
   }
 
   buildUserAccountIdTextField() {
@@ -100,15 +121,19 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver{
 
   buildAccountIdErrorMessage() {
     return invalidAccountId
-        ? const Padding(
-            padding: EdgeInsets.symmetric(vertical: 8.0),
-            child: Text(
-              " Invalid near account ID (e.g. hamzatest.testnet) ",
-              style: TextStyle(
-                  color: Colors.redAccent, backgroundColor: Colors.amberAccent),
-            ),
-          )
+        ? buildErrorText("Invalid near account ID (e.g. hamzatest.testnet)")
         : Container();
+  }
+
+  buildErrorText(errorMessage) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: Text(
+        " $errorMessage ",
+        style: const TextStyle(
+            color: Colors.redAccent, backgroundColor: Colors.amberAccent),
+      ),
+    );
   }
 
   buildLoginButton() {
@@ -119,10 +144,7 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver{
             child: const Text("Connect Wallet"))
         : ElevatedButton(
             onPressed: () {
-              setState(() {
-                isLoggedIn = true;
-              });
-              NearApiFlutter.connectWallet(accountId, keyPair);
+              NearApiFlutter.connectWallet(accountId, provider.keyPair);
             },
             child: const Text("Connect Wallet"));
   }
