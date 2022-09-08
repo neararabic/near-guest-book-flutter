@@ -24,10 +24,12 @@ class WalletConnectProvider with ChangeNotifier {
   WalletConnectProvider._internal();
 
   KeyPair? keyPair;
+  String? userAccountId;
 
   checkLoggedInUser() async {
     keyPair = await LocalStorage.loadKeys();
-    if (keyPair != null) {
+    userAccountId = await LocalStorage.loadUserId();
+    if (keyPair != null && userAccountId != null) {
       updateState(WalletConnectionState.loggedIn);
     } else {
       updateState(WalletConnectionState.loggedOut);
@@ -37,7 +39,7 @@ class WalletConnectProvider with ChangeNotifier {
   validateLogin(accountId, KeyPair keyPair) async {
     updateState(WalletConnectionState.validatingLogin);
     if (await NearApiFlutter().hasAccessKey(accountId, keyPair)) {
-      await LocalStorage.saveKeys(keyPair);
+      await LocalStorage.saveKeys(keyPair, accountId);
       updateState(WalletConnectionState.loggedIn);
     } else {
       updateState(WalletConnectionState.loginFailed);

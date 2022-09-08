@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_guest_book/constants.dart';
 import 'package:flutter_guest_book/providers/connect_wallet_provider.dart';
 import 'package:flutter_guest_book/providers/home_page.dart';
 import 'package:flutter_guest_book/screens/home_page.dart';
@@ -19,7 +20,7 @@ class MyApp extends StatelessWidget {
         title: 'Guest Book',
         theme: ThemeData(
             colorScheme: ColorScheme.fromSwatch()
-                .copyWith(primary: const Color.fromARGB(255, 142, 193, 217))
+                .copyWith(primary: Constants.APP_MAIN_COLOR)
             // primarySwatch: const Color.fromARGB(255, 142, 193, 217),
             ),
         home: Scaffold(
@@ -51,7 +52,7 @@ class AppContainer extends StatelessWidget {
         provider.checkLoggedInUser();
         return const CenteredCircularProgressIndicator();
       case WalletConnectionState.loggedIn:
-        return HomePage(keyPair: provider.keyPair!);
+        return HomePage(keyPair: provider.keyPair!, userAccountId: provider.userAccountId!);
       case WalletConnectionState.loggedOut:
       case WalletConnectionState.loginFailed:
         return const ConnectWalletScreen();

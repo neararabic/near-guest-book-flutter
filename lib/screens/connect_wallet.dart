@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_guest_book/constants.dart';
 import 'package:flutter_guest_book/providers/connect_wallet_provider.dart';
 import 'package:flutter_guest_book/screens/home_page.dart';
 import 'package:near_api_flutter/near_api_flutter.dart';
@@ -28,6 +29,7 @@ class _ConnectWalletScreenState extends State<ConnectWalletScreen>
           Navigator.of(context).pushReplacement(MaterialPageRoute(
               builder: (context) => HomePage(
                     keyPair: provider.keyPair!,
+                    userAccountId: provider.userAccountId!,
                   )));
         });
         return const CenteredCircularProgressIndicator();
@@ -102,15 +104,7 @@ class _ConnectWalletScreenState extends State<ConnectWalletScreen>
   }
 
   connectWallet(accountId) {
-    //TODO replace with your own contract id and urls
-    const String walletURL = 'https://wallet.testnet.near.org/login/?';
-    const String contractId = 'guestbook.nearflutter.testnet';
-    const String appTitle = 'GuestBook';
-    const String signInSuccessUrl =
-        'https://near-transaction-serializer.herokuapp.com/success';
-    const String signInFailureUrl =
-        'https://near-transaction-serializer.herokuapp.com/failure';
-
+    provider.userAccountId = accountId;
     provider.keyPair = KeyStore.newKeyPair();
 
     //Create NEAR Account object to connect to the wallet with
@@ -122,8 +116,12 @@ class _ConnectWalletScreenState extends State<ConnectWalletScreen>
     //create a wallet object and connect to it
     //this will open the wallet, and when the user navigates back to this screen,
     //the didChangeAppLifecycleState will be called. We go from there.
-    var wallet = Wallet(walletURL);
-    wallet.connect(contractId, appTitle, signInSuccessUrl, signInFailureUrl,
+    var wallet = Wallet(Constants.WALLET_LOGIN_URL);
+    wallet.connect(
+        Constants.CONTRACT_ID,
+        Constants.APP_TITLE,
+        Constants.WEB_SUCCESS_URL,
+        Constants.WEB_FAILURE_URL,
         account.publicKey);
   }
 

@@ -3,7 +3,7 @@ import 'package:near_api_flutter/near_api_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LocalStorage {
-  static saveKeys(KeyPair keyPair) async {
+  static saveKeys(KeyPair keyPair, String accountId) async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     List<String> privateKeyStrList =
         keyPair.privateKey.bytes.map((i) => i.toString()).toList();
@@ -13,10 +13,12 @@ class LocalStorage {
     await pref.setStringList(Constants.PRIVATE_KEY_STRING, privateKeyStrList);
 
     await pref.setStringList(Constants.PUBLIC_KEY_STRING, publicKeyStrList);
+
+    await pref.setString(Constants.USER_ACCOUNT_ID, accountId);
   }
 
   static Future<KeyPair?> loadKeys() async {
-    final prefs = await SharedPreferences. getInstance();
+    final prefs = await SharedPreferences.getInstance();
 
     //private key handling
     final List<String>? privateKeyStr =
@@ -46,5 +48,10 @@ class LocalStorage {
     KeyPair pair = KeyPair(privateKey, publicKey);
 
     return pair;
+  }
+
+  static Future<String?> loadUserId() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(Constants.USER_ACCOUNT_ID);
   }
 }
