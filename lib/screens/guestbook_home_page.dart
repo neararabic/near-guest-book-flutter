@@ -160,7 +160,7 @@ class _GuestbookPageState extends State<GuestbookPage> with WidgetsBindingObserv
     super.dispose();
   }
 
-
+//this is to reload messages when adding new one and when coming back from signing
 @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
