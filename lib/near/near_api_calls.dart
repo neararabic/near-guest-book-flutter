@@ -1,13 +1,20 @@
-
 import 'package:near_api_flutter/near_api_flutter.dart';
 
 import '../constants.dart';
 
-class NEARApi{
+class NEARApi {
+  callViewFunction(userAccountId, keyPair, method, args) async {
+    Account connectedAccount = Account(
+        accountId: userAccountId,
+        keyPair: keyPair,
+        provider: NEARTestNetRPCProvider());
 
+    Contract contract = Contract(Constants.CONTRACT_ID, connectedAccount);
+    Map response = await contract.callViewFuntion(method, args);
+    return response;
+  }
 
-  callFunction(userAccountId, keyPair, deposit, method, args) async{
-
+  callFunction(userAccountId, keyPair, deposit, method, args) async {
     Account connectedAccount = Account(
         accountId: userAccountId,
         keyPair: keyPair,
@@ -28,9 +35,8 @@ class NEARApi{
     } else {
       response = await contract.callFunction(method, args);
     }
-   return response;
+    return response;
   }
-
 
   Future<bool> hasAccessKey(accountId, KeyPair keyPair) async {
     Account account = Account(
@@ -41,10 +47,8 @@ class NEARApi{
     return accessKey.nonce == -1 ? false : true;
   }
 
-
   //singleton
-  static final NEARApi _singleton =
-  NEARApi._internal();
+  static final NEARApi _singleton = NEARApi._internal();
 
   factory NEARApi() {
     return _singleton;

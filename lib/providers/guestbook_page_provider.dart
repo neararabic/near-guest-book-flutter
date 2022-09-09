@@ -17,10 +17,9 @@ class GuestbookPageProvider with ChangeNotifier {
     String args = '';
 
     var response =
-        await NEARApi().callFunction(userAccountId, keyPair, 0, method, args);
+        await NEARApi().callViewFunction(userAccountId, keyPair, method, args);
     try {
-      var result = utf8.decode(
-          base64.decoder.convert(response['result']['status']['SuccessValue']));
+      var result = utf8.decode(response['result']['result'].cast<int>());
       messages = (json.decode(result) as List)
           .map((e) => Message.fromJson(e))
           .toList();
@@ -36,8 +35,8 @@ class GuestbookPageProvider with ChangeNotifier {
 
     String method = 'add_message';
     String args = '{"text":"$message"}';
-    var response =
-        await NEARApi().callFunction(userAccountId, keyPair, deposit, method, args);
+    var response = await NEARApi()
+        .callFunction(userAccountId, keyPair, deposit, method, args);
     if (response.containsKey("error")) {
       transactionMessage = " Something went wrong! ";
     } else {
