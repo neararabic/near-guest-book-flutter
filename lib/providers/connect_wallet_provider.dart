@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_guest_book/near_api_flutter.dart';
 import 'package:near_api_flutter/near_api_flutter.dart';
 import '../local_storage.dart';
+import '../near/near_api_calls.dart';
 
 enum WalletConnectionState {
   initial,
@@ -12,8 +12,41 @@ enum WalletConnectionState {
 }
 
 class WalletConnectProvider with ChangeNotifier {
+  KeyPair? keyPair;
+  String? userAccountId;
   WalletConnectionState state = WalletConnectionState.initial;
 
+  checkLoggedInUser() async {
+    keyPair = await LocalStorage.loadKeys();
+    userAccountId = await LocalStorage.loadUserId();
+
+    if (keyPair != null && userAccountId != null) {
+      updateState(WalletConnectionState.loggedIn);
+    } else {
+      updateState(WalletConnectionState.loggedOut);
+    }
+  }
+
+  checkWalletConnectionResult(accountId, KeyPair keyPair) async {
+    updateState(WalletConnectionState.validatingLogin);
+
+    var accessKeyFound = await NEARApi().hasAccessKey(accountId, keyPair);
+    if (accessKeyFound) {
+      await LocalStorage.saveKeys(keyPair, accountId);
+      updateState(WalletConnectionState.loggedIn);
+    } else {
+      updateState(WalletConnectionState.loginFailed);
+    }
+
+  }
+
+  //notify ui with the updates state
+  updateState(WalletConnectionState state) {
+    this.state = state;
+    notifyListeners();
+  }
+
+  //singleton
   static final WalletConnectProvider _singleton =
       WalletConnectProvider._internal();
 
@@ -22,32 +55,4 @@ class WalletConnectProvider with ChangeNotifier {
   }
 
   WalletConnectProvider._internal();
-
-  KeyPair? keyPair;
-  String? userAccountId;
-
-  checkLoggedInUser() async {
-    keyPair = await LocalStorage.loadKeys();
-    userAccountId = await LocalStorage.loadUserId();
-    if (keyPair != null && userAccountId != null) {
-      updateState(WalletConnectionState.loggedIn);
-    } else {
-      updateState(WalletConnectionState.loggedOut);
-    }
-  }
-
-  validateLogin(accountId, KeyPair keyPair) async {
-    updateState(WalletConnectionState.validatingLogin);
-    if (await NearApiFlutter().hasAccessKey(accountId, keyPair)) {
-      await LocalStorage.saveKeys(keyPair, accountId);
-      updateState(WalletConnectionState.loggedIn);
-    } else {
-      updateState(WalletConnectionState.loginFailed);
-    }
-  }
-
-  updateState(WalletConnectionState state) {
-    this.state = state;
-    notifyListeners();
-  }
 }

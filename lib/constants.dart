@@ -4,7 +4,6 @@ class Constants {
   static const String PRIVATE_KEY_STRING = "PRIVATE_KEY_STRING";
   static const String PUBLIC_KEY_STRING = "PUBLIC_KEY_STRING";
   static const String USER_ACCOUNT_ID = "USER_ACCOUNT_ID";
-  static const APP_MAIN_COLOR = Color.fromARGB(255, 142, 193, 217);
 
   //TODO replace with your own contract id and urls
   static const String WALLET_LOGIN_URL =

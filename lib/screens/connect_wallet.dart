@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_guest_book/constants.dart';
 import 'package:flutter_guest_book/providers/connect_wallet_provider.dart';
-import 'package:flutter_guest_book/screens/home_page.dart';
+import 'package:flutter_guest_book/screens/guestbook_home_page.dart';
 import 'package:near_api_flutter/near_api_flutter.dart';
 import 'package:provider/provider.dart';
 
@@ -27,7 +27,7 @@ class _ConnectWalletScreenState extends State<ConnectWalletScreen>
       case WalletConnectionState.loggedIn:
         Future.delayed(const Duration(seconds: 2)).then((_) {
           Navigator.of(context).pushReplacement(MaterialPageRoute(
-              builder: (context) => HomePage(
+              builder: (context) => GuestbookPage(
                     keyPair: provider.keyPair!,
                     userAccountId: provider.userAccountId!,
                   )));
@@ -44,27 +44,15 @@ class _ConnectWalletScreenState extends State<ConnectWalletScreen>
     }
   }
 
-  buildLoginFailed() {
-    return Column(
-      children: [
-        buildLoginCard(),
-        const Text(
-          "Wallet connection failed, please try again",
-          style: TextStyle(
-              color: Colors.redAccent, backgroundColor: Colors.amberAccent),
-        )
-      ],
-    );
-  }
-
   buildLoginCard() {
-    return SizedBox(
-      height: 150,
+    return Padding(
+      padding: const EdgeInsets.all(10.0),
       child: Card(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            SafeArea(
+            Padding(
+              padding: const EdgeInsets.all(8.0),
               child: TextField(
                 onChanged: (value) {
                   setState(() {
@@ -103,6 +91,21 @@ class _ConnectWalletScreenState extends State<ConnectWalletScreen>
     );
   }
 
+  buildLoginFailed() {
+    return Padding(
+      padding: const EdgeInsets.all(20.0),
+      child: Column(
+        children: [
+          buildLoginCard(),
+          const Text(
+            "Wallet connection failed, please try again",
+            style: TextStyle(
+                color: Colors.redAccent, backgroundColor: Colors.amberAccent),
+          )
+        ],
+      ),
+    );
+  }
   connectWallet(accountId) {
     provider.userAccountId = accountId;
     provider.keyPair = KeyStore.newKeyPair();
@@ -132,7 +135,7 @@ class _ConnectWalletScreenState extends State<ConnectWalletScreen>
     switch (state) {
       case AppLifecycleState.resumed:
         if (accountId != "") {
-          WalletConnectProvider().validateLogin(
+          WalletConnectProvider().checkWalletConnectionResult(
               accountId, provider.keyPair!); //changes ui state to validating
         }
         break;
