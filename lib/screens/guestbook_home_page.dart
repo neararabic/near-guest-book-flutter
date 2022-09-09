@@ -117,9 +117,19 @@ class _GuestbookPageState extends State<GuestbookPage>
         Card(
           child: Container(),
         ),
-        const Text(
-          "Messages (last 20)",
-          style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            const Text(
+              "Messages (last 20)",
+              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+            ),
+            ElevatedButton(
+                onPressed: () {
+                  provider.updateState(HomePageState.reloadMessages);
+                },
+                child: const Text("Refresh"))
+          ],
         ),
         Expanded(
           child: ListView.builder(
