@@ -68,13 +68,14 @@ class _GuestbookPageState extends State<GuestbookPage>
                       width: 20,
                     ),
                     SizedBox(
-                      width: 50,
+                      width: 70,
                       child: TextField(
                         controller: donationController,
                         decoration: const InputDecoration(labelText: ""),
                         keyboardType: TextInputType.number,
                         inputFormatters: <TextInputFormatter>[
-                          FilteringTextInputFormatter.digitsOnly
+                          FilteringTextInputFormatter.allow(
+                              RegExp(r'^\d+\.?\d{0,5}'))
                         ],
                       ),
                     ),
