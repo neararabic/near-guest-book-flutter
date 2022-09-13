@@ -19,11 +19,12 @@ class GuestbookPage extends StatefulWidget {
   State<GuestbookPage> createState() => _GuestbookPageState();
 }
 
-class _GuestbookPageState extends State<GuestbookPage> with WidgetsBindingObserver {
+class _GuestbookPageState extends State<GuestbookPage>
+    with WidgetsBindingObserver {
   late BuildContext buildContext;
-  String message = "";
-  double donation = 0;
   late GuestbookPageProvider provider;
+  final messageController = TextEditingController();
+  final donationController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -31,6 +32,8 @@ class _GuestbookPageState extends State<GuestbookPage> with WidgetsBindingObserv
     switch (provider.state) {
       case HomePageState.initial:
       case HomePageState.reloadMessages:
+        messageController.text = '';
+        donationController.text = '';
         provider.getMessages(widget.keyPair, widget.userAccountId);
         return const CenteredCircularProgressIndicator();
       case HomePageState.addingMessage:
@@ -45,18 +48,15 @@ class _GuestbookPageState extends State<GuestbookPage> with WidgetsBindingObserv
         body: Padding(
       padding: const EdgeInsets.all(20),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        const Text("Contract: ${Constants.CONTRACT_ID}", style: TextStyle(fontWeight: FontWeight.bold)),
+        const Text("Contract: ${Constants.CONTRACT_ID}",
+            style: TextStyle(fontWeight: FontWeight.bold)),
         Card(
           child: Padding(
             padding: const EdgeInsets.all(8.0),
             child: Column(
               children: [
                 TextField(
-                  onChanged: (value) {
-                    setState(() {
-                      message = value;
-                    });
-                  },
+                  controller: messageController,
                   decoration: const InputDecoration(labelText: "Message:"),
                 ),
                 Row(
@@ -68,17 +68,14 @@ class _GuestbookPageState extends State<GuestbookPage> with WidgetsBindingObserv
                       width: 20,
                     ),
                     SizedBox(
-                      width: 50,
+                      width: 70,
                       child: TextField(
-                        onChanged: (value) {
-                          setState(() {
-                            donation = double.parse(value);
-                          });
-                        },
+                        controller: donationController,
                         decoration: const InputDecoration(labelText: ""),
                         keyboardType: TextInputType.number,
                         inputFormatters: <TextInputFormatter>[
-                          FilteringTextInputFormatter.digitsOnly
+                          FilteringTextInputFormatter.allow(
+                              RegExp(r'^\d+\.?\d{0,5}'))
                         ],
                       ),
                     ),
@@ -92,6 +89,10 @@ class _GuestbookPageState extends State<GuestbookPage> with WidgetsBindingObserv
                   children: [
                     ElevatedButton(
                         onPressed: () {
+                          String message = messageController.text;
+                          double donation = donationController.text.isNotEmpty
+                              ? double.parse(donationController.text)
+                              : 0;
                           provider.addMessage(widget.keyPair,
                               widget.userAccountId, message, donation);
                         },
@@ -102,8 +103,7 @@ class _GuestbookPageState extends State<GuestbookPage> with WidgetsBindingObserv
                     Text(
                       provider.transactionMessage,
                       style: const TextStyle(
-                          backgroundColor: Colors.blue,
-                          color: Colors.white),
+                          backgroundColor: Colors.blue, color: Colors.white),
                     )
                   ],
                 ),
@@ -117,9 +117,19 @@ class _GuestbookPageState extends State<GuestbookPage> with WidgetsBindingObserv
         Card(
           child: Container(),
         ),
-        const Text(
-          "Messages (last 20)",
-          style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            const Text(
+              "Messages (last 20)",
+              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+            ),
+            ElevatedButton(
+                onPressed: () {
+                  provider.updateState(HomePageState.reloadMessages);
+                },
+                child: const Text("Refresh"))
+          ],
         ),
         Expanded(
           child: ListView.builder(
@@ -157,11 +167,13 @@ class _GuestbookPageState extends State<GuestbookPage> with WidgetsBindingObserv
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    messageController.dispose();
+    donationController.dispose();
     super.dispose();
   }
 
 //this is to reload messages when adding new one and when coming back from signing
-@override
+  @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
     //detect when app opens back after connecting to te wallet
