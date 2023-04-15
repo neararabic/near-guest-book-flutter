@@ -15,7 +15,7 @@ A flutter app using [near_flutter_api](https://pub.dev/packages/near_api_flutter
 
 
 | Sign Transaction  | View Transaction Result |
-| ------------- | ------------- | ------------- |
+| ------------- | ------------- |
 | <img src="https://user-images.githubusercontent.com/34034904/232229803-52a3c267-a8e3-4efb-a48a-bc500d267a77.png" width="250"> | <img src="https://user-images.githubusercontent.com/34034904/232229809-50ba07f4-fd4d-4c63-96f9-7a19938b3bbf.png" width="250">  |
 
 
